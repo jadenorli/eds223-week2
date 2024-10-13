@@ -1,0 +1,54 @@
+---
+title: "EDS_223_DS2"
+format: html
+editor: visual
+---
+
+#Load Packages
+
+```{r}
+library(here)
+library(tidyverse)
+library(sf)
+library(tmap)
+```
+
+#Read in Vector Data
+
+```{r}
+#read in the vector data from Colombiaa's Terrestial Exosystems 
+##read in the Colombia shape geometry
+colombia <- st_read(here::here("data", "Colombia", "Colombia.shp"))
+
+##read in the roads data
+roads <- st_read(here::here("data", "RDLINE_colombia", "RDLINE_colombia.shp"))
+
+##read in the avian observations and convert the csv to a sf object 
+aves <- readr::read_csv(here::here("data", "dataves.csv")) %>%
+  dplyr::as_tibble() %>%
+  dplyr::rename(long = decimal_longitude) %>% #rename decimal_longitude to long
+  dplyr::mutate(lat = decimal_latitude) %>% #rename decimal_latitude to lat
+  st_as_sf(coords = c("long", "lat"), crs = 4326) #convert the table to a sf object 
+  
+```
+
+#Check Class and Geometry Type
+
+```{r}
+#check the class of the data
+class(colombia)
+class(roads)
+class(aves)
+
+#check the geometry type of the data
+unique(st_geometry_type(colombia))
+unique(st_geometry_type(roads))
+unique(st_geometry_type(aves))
+
+```
+
+#Isolate Macro Region of Interest
+
+```{r}
+
+```
