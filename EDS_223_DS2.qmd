@@ -50,5 +50,82 @@ unique(st_geometry_type(aves))
 #Isolate Macro Region of Interest
 
 ```{r}
+#isolate the Amazonian region of Colombia
+amazonian <- colombia %>%
+   #set categorical "levels" in attribute N1_MacroBi (subregions of Colombia)
+  dplyr::mutate(N1_MacroBi = as.factor(N1_MacroBi)) %>%
+  dplyr::filter(N1_MacroBi == "Amazonian")
+
+#check the class of the new dataframe
+class(amazonian)
+```
+
+#Plot the Amazonian Region of Colombia
+
+```{r}
+tm_shape(amazonian) +
+  tm_polygons() +
+  tm_layout(main.title = "Amazonian Region of Colombia",
+            main.title.size = 1)
+```
+
+#Assign a New CRS
+
+```{r}
+#print the CRS of each spatial object
+st_crs(colombia)
+st_crs(roads)
+st_crs(aves)
+
+#print the units of each CRS
+st_crs(colombia)$units
+st_crs(roads)$units
+st_crs(aves)$units
+
+#use different methods to extract the longitude and latitude from the geometry column
+##purr approach
+aves_purrr <- aves %>%
+  mutate(lon = unlist(purrr::map(aves$geometry, 1)), #longitude = first component (x)
+         lat = unlist(purrr::map(aves$geometry, 2))) %>% #latitude = second component (y)
+  st_drop_geometry() #remove the geometry column now that it is redundant
+
+##st_coordiantes approach
+aves_st_coords <- aves %>%
+  dplyr::mutate(lon = sf::st_coordinates(.)[,1], #assign first matrix item to "lon"
+                lat = sf::st_coordinates(.)[,2]) %>% #assign second matrix item to "lat"
+  st_drop_geometry()
+
+#convert the df to an sf object again
+aves_purrr <- aves %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+```
+
+#Bring All Vector Data Types Together
+
+```{r}
+#check if CRS match between the two datasets
+st_crs(colombia) == st_crs(roads)
+
+# Transform bird data into same CRS as other Colombia data
+aves <- st_transform(aves, crs = st_crs(colombia))
+
+```
+
+#Plot of Ecoregions, Roads, and Avian Data
+
+```{r}
+#plot all three layers 
+tm_shape(colombia) +
+  tm_polygons(fill = "N1_MacroBi",
+              title = "Ecoregions") +
+  tm_shape(roads) +
+  tm_lines(col = "brown",
+           legend.col.show = FALSE,
+           lwd = 1) +
+  tm_shape(aves) +
+  tm_dots(col = "violet")+
+  tm_layout(main.title = "Colombia Ecoregions, Roads, and Avian Observations",
+            main.title.size = 1)
 
 ```
