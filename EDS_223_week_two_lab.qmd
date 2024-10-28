@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-## Load Necessary Libraries
+# Load Necessary Libraries
 
 ```{r}
 #this clears out the environment
@@ -19,6 +19,7 @@ library(tmap)
 ```
 
 # Building Sample Data
+
 ```{r}
 #create a sfg
 london_point <- st_point(c(0.1, 51.5)) #longitude = 0.1 and latitude = 51.5
@@ -47,7 +48,6 @@ st_crs(london_sf)$IsGeographic
 ```
 
 
-
 ```{r}
 #load in spData for the world 
 world <- spData::world
@@ -73,6 +73,7 @@ class(world_df)
 ```
 
 # Reprojecting Data
+
 ```{r}
 #use a projected coordinate system 
 ##things are represented in meters instead of latitude and longitude with the projection 
@@ -93,7 +94,6 @@ london_sf_transfrom <- st_transform(london_sf, crs = st_crs(london_proj))
 
 ```
 
-
 ```{r}
 #build a conditional statement to verify that the transformation was successful and print a warning if it doesn't match 
 if(st_crs(london_sf_transfrom) == st_crs(london_proj)) {
@@ -113,8 +113,8 @@ if(st_crs(london_sf_transfrom) == st_crs(london_proj)) {
 
 ```
 
-
 # Make a Gloabl Map
+
 ```{r}
 #compare global maps using two different projections 
 
@@ -128,9 +128,8 @@ tm_shape(world, projection = 3395) +
 
 ```
 
-
-
 # Vector Attribute Subsetting
+
 ```{r}
 #dplyr select
 #select which columns you want
@@ -163,8 +162,8 @@ world %>%
 
 ```
 
-
 # Joins with Vector Attributes
+
 ```{r}
 #load in the coffee data from the spData package
 coffee_data <- spData::coffee_data
@@ -179,15 +178,17 @@ world_coffee <- left_join(world, coffee_data, by = "name_long")
 
 ```
 
-
 # Map of World Coffee
+
 ```{r}
 #create a map with tmap of the world coffee production in 2017
 tm_shape(world_coffee) +
   tm_fill(col = "coffee_production_2017")
+
 ```
 
 # Inner Join
+
 ```{r}
 #inner join only keeps matches between both datasets
 ##this lost data and only have 45 variables instead of 47
@@ -217,9 +218,8 @@ world_coffee_inner <- inner_join(world, coffee_data, by = "name_long")
 
 ```
 
-
-
 # Coffee Production Map
+
 ```{r}
 #plot just the countries which produce coffee 
 tm_shape(world_coffee_inner) +
@@ -229,11 +229,10 @@ tm_shape(world_coffee_inner) +
 
 ```
 
-
 # Left Join with Sf Data
+
 ```{r}
 #the left join will keep the class of the original object 
 coffee_world <- left_join(coffee_data, world, by = "name_long")
 class(coffee_world)
 ```
-
